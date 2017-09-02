@@ -5,24 +5,33 @@ function CameraWorld(world, width, height)
     this.width = width ? width : world.width;
     this.height = height ? height : world.height;
 }
-
-function BoxOverlay(game, color)
+function BaseOverlay(game) //overlay should be null (it's here to display the interface), but it will work if not used as the base one
 {
     this.game = game;
-    this.color = color;
-    this.setPort = function(port)
+    this.getView = function(port)
     {
-        this.view.x = port.x;
-        this.view.y = port.y;
+        var ret = new Phaser.Group(game, null);
+        ret.x = port.x;
+        ret.y = port.y;
+        return ret;
+    }
+}
+function BoxOverlay(baseOverlay, color)
+{
+    this.color = color;
+    this.baseOverlay = baseOverlay;
+    this.getView = function(port)
+    {
+        var ret = this.baseOverlay.getView(port);
 
-        var viewPortRect2 = new Phaser.Graphics(this.game);
+        var viewPortRect2 = new Phaser.Graphics(this.baseOverlay.game);
         viewPortRect2.beginFill(color, 0);
         viewPortRect2.lineStyle(1, color);
-        viewPortRect2.drawRect(0, 0, port.width, port.height);
+        viewPortRect2.drawRect(0, 0, port.width-1, port.height-1);
         viewPortRect2.endFill();
-        this.view.addChild(viewPortRect2)
+        ret.addChild(viewPortRect2);
+        return ret;
     };
-    this.view = new Phaser.Group(game, null);
 }
 
 function Screen() {
@@ -58,8 +67,7 @@ Screen.prototype.setCamera = function(idx, camworld, target, overlay)
     cam.bounds.height = camworld.height;
     this.cams[idx] = cam;
     if(overlay){
-        overlay.setPort(this.cams[idx].port);
-        this.overlays[idx] = overlay;
+        this.overlays[idx] = overlay.getView(this.cams[idx].port);
     }
 };
 
@@ -77,8 +85,7 @@ Screen.prototype.setMinimap = function (camworld, overlay)
     this.minimap.setDisplayTarget(camworld.world);
     if(overlay)
     {
-        overlay.setPort(this.minimap.port);
-        this.minimapOverlay = overlay;
+        this.minimapOverlay = overlay.getView(this.minimap.port);
     }
 };
 
@@ -91,12 +98,12 @@ Screen.prototype.update = function()
         {
             this.game.world.addChild(this.cams[idx].view);
             if(this.overlays[idx])
-                this.game.world.addChild(this.overlays[idx].view);
+                this.game.world.addChild(this.overlays[idx]);
         }
         if(this.minimap) {
             this.game.world.addChild(this.minimap.view);
             if(this.minimapOverlay)
-                this.game.world.addChild(this.minimapOverlay.view);
+                this.game.world.addChild(this.minimapOverlay);
         }
     }
 

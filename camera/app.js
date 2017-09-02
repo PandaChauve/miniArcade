@@ -29,9 +29,10 @@ function create() {
 
     var world = new CameraWorld(worldStage, mapSpr.width, mapSpr.height);
     screen = new Screen(game, 2);
-    screen.setMinimap(world, new BoxOverlay(game, 0x000000));
-    screen.setCamera(0, world, viewPortRect, new BoxOverlay(game, 0x000000));
-    screen.setCamera(1, world, viewPortRect, new BoxOverlay(game, 0x000000));
+    var overlay = new BoxOverlay(new BaseOverlay(game), 0x000000);
+    screen.setMinimap(world, overlay);
+    screen.setCamera(0, world, viewPortRect, overlay);
+    screen.setCamera(1, world, viewPortRect, overlay);
 }
 
 function move(x,y)
