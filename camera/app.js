@@ -1,18 +1,8 @@
-var game = new Phaser.Game(1920, 1080, Phaser.AUTO, "content", { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, "content", { preload: preload, create: create, update: update });
 
-var container;
 var worldStage;
 var mapSpr;
 
-var mainCamera;
-var mainCamera2;
-var minimapCamera;
-
-var dir = "down";
-var camSpeed = 8;
-
-var mainCameraWidth = 1920/2;
-var mainCameraHeight = 1080;
 
 function preload() {
     game.load.image("map", "../tuto2/assets/sky.png");
@@ -38,24 +28,22 @@ function create() {
     worldStage.addChild(viewPortRect);
 
     var world = new CameraWorld(worldStage, mapSpr.width, mapSpr.height);
-    screen = new Screen(game, 4);
-    screen.setMinimap(world);
-    screen.setCamera(0, world, viewPortRect);
-    screen.setCamera(1, world, viewPortRect);
-    screen.setCamera(2, world, viewPortRect);
-    screen.setCamera(3, world, viewPortRect);
+    screen = new Screen(game, 2);
+    screen.setMinimap(world, new BoxOverlay(game, 0x000000));
+    screen.setCamera(0, world, viewPortRect, new BoxOverlay(game, 0x000000));
+    screen.setCamera(1, world, viewPortRect, new BoxOverlay(game, 0x000000));
 }
 
 function move(x,y)
 {
     x+=viewPortRect.position.x;
     y+=viewPortRect.position.y;
-    viewPortRect.position.x = Math.max(0, Math.min(1920,
+    viewPortRect.position.x = Math.max(0, Math.min(1900,
         x  ));
-    viewPortRect.position.y = Math.max(0, Math.min(1080,
+    viewPortRect.position.y = Math.max(0, Math.min(1000,
         y  ));
 }
 function update() {
-    move(1, 1);
+    move(1.5, 1);
     screen.update();
 }

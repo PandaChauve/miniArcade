@@ -9,10 +9,10 @@ function Camera() {
     this.initialize.apply(this, arguments);
 }
 
-Camera.prototype.initialize = function(game, worldWidth, worldHeight, portX, portY, portWidth, portHeight) {
+Camera.prototype.initialize = function(game, worldWidth, worldHeight, port) {
     this.game = game;
     this.world = new Phaser.Rectangle(0, 0, worldWidth, worldHeight);
-    this.port = new Phaser.Rectangle(portX, portY, portWidth, portHeight);
+    this.port = port;
     this.texture = new Phaser.RenderTexture(this.game, this.world.width, this.world.height);
     this.view = new Phaser.Sprite(this.game, this.port.x, this.port.y, this.texture);
     this.bounds = new Phaser.Rectangle(0, 0, -1, -1);
