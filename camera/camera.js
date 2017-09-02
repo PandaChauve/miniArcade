@@ -3,7 +3,7 @@
 // Cameras have separate world and port rectangles
 // World rectangles represent the area of the world (their display target) they show,
 //  while Port rectangle represent the area of the screen they're displayed on
-//https://raw.githubusercontent.com/MikauSchekzen/phaser-cameras-example/master/lib/camera.js
+// https://github.com/MikauSchekzen/phaser-cameras-example
 
 function Camera() {
     this.initialize.apply(this, arguments);
