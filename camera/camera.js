@@ -12,20 +12,12 @@ function Camera() {
 Camera.prototype.initialize = function(game, worldWidth, worldHeight, portX, portY, portWidth, portHeight) {
     this.game = game;
     this.world = new Phaser.Rectangle(0, 0, worldWidth, worldHeight);
-    this.port = new Phaser.Rectangle(portX+1, portY+1, portWidth-1, portHeight-1);
+    this.port = new Phaser.Rectangle(portX, portY, portWidth, portHeight);
     this.texture = new Phaser.RenderTexture(this.game, this.world.width, this.world.height);
     this.view = new Phaser.Sprite(this.game, this.port.x, this.port.y, this.texture);
     this.bounds = new Phaser.Rectangle(0, 0, -1, -1);
     this.displayTarget = null;
     this.followed = null;
-
-
-    var viewPortRect = new Phaser.Graphics(game, portX, portY);
-    viewPortRect.beginFill(0x000000, 0);
-    viewPortRect.lineStyle(1, 0x00ffff);
-    viewPortRect.drawRect(0, 0, portWidth, portHeight);
-    viewPortRect.endFill();
-    game.world.addChild(viewPortRect);
 };
 
 // Sets this camera's display target
