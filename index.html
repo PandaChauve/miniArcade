@@ -91,7 +91,7 @@
     function start()
     {
         players= [world.addStatic("assets/arrow1.png", 100,100), world.addStatic("assets/arrow2.png", 200,200)];
-        cams = [new Camera(400, 400, players[0]), new Camera(400, 400, players[1])];
+        cams = [new Camera(400, 400, players[0]), new Camera(400, 400, players[1], world)];
 
         var wall = spriteCache.createSprite("assets/wall.png");
         var size = {

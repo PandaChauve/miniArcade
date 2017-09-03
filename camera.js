@@ -1,5 +1,5 @@
 var cameraId = 0;
-function Camera(width, height, target)
+function Camera(width, height, target, world)
 {
     this.width = width;
     this.height = height;
@@ -12,7 +12,11 @@ function Camera(width, height, target)
     //Add the canvas to the HTML document
     document.body.appendChild(this.renderer.view);
     this.container = new PIXI.Container();
-
+    if(world)
+    {
+        this.container.scale.set(width/world.width, height/world.height);
+        this.target = null;//never target in minimap mode
+    }
 }
 
 Camera.prototype.draw = function(world)
@@ -42,6 +46,7 @@ Camera.prototype.draw = function(world)
 
         this.container.position.set(x+leftMargin,y+topMargin);
     }
+
 
     //Tell the `renderer` to `render` the `stage`
     this.renderer.render(this.container);
