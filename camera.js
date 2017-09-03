@@ -1,5 +1,5 @@
 var cameraId = 0;
-function Camera(width, height, target, world)
+function Camera(width, height, target, world, overlay)
 {
     this.width = width;
     this.height = height;
@@ -7,14 +7,19 @@ function Camera(width, height, target, world)
     cameraId++;
     this.camId = cameraId;
     //Create the renderer
-    this.renderer = PIXI.autoDetectRenderer(this.width, this.height);
+    this.renderer = PIXI.autoDetectRenderer(this.width, this.height, { antialias: true, backgroundColor: 0xffffff});
 
     //Add the canvas to the HTML document
     document.body.appendChild(this.renderer.view);
+    this.gameContainer = new PIXI.Container();
+    this.overlayContainer = overlay;
     this.container = new PIXI.Container();
+    this.container.addChild(this.gameContainer);
+    if(this.overlayContainer)
+        this.container.addChild(this.overlayContainer);
     if(world)
     {
-        this.container.scale.set(width/world.width,height/world.height);
+        this.gameContainer.scale.set(width/world.width,height/world.height);
         this.target = null;//never target in minimap mode
     }
 }
@@ -36,7 +41,7 @@ Camera.prototype.draw = function(world)
             else
                 obj.cam[this.camId].position.set(obj.x, obj.y);
             obj.cam[this.camId].rotation = -obj.body.angle;
-            this.container.addChild(obj.cam[this.camId]);
+            this.gameContainer.addChild(obj.cam[this.camId]);
         }
     }
 
@@ -47,7 +52,7 @@ Camera.prototype.draw = function(world)
         var x = Math.max(Math.min(-this.target.body.position[0], -leftMargin), -world.width+leftMargin);
         var y = Math.max(Math.min(this.target.body.position[1], -topMargin), -world.height+topMargin);
 
-        this.container.position.set(x+leftMargin,y+topMargin);
+        this.gameContainer.position.set(x+leftMargin,y+topMargin);
     }
 
 

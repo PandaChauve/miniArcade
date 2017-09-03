@@ -88,14 +88,20 @@
 
     var players;
    var cams;
-
+var counter = 0;
 
     function gameLoop() {
 
         //Loop this function at 60 frames per second
         requestAnimationFrame(gameLoop);
-
-        world.p2.step(1/60);
+        counter++;
+        if(counter === 10) {
+            var t1 = performance.now();
+            txt.text = Math.floor(1 / (t1 - t0) * 10000) + "fps";
+            t0 = t1;
+            counter = 0;
+        }
+        world.p2.step(1 / 60);
         var speed = 1;
         for(var i = 0; i < players.length; ++i)
         {
@@ -120,10 +126,21 @@
         world.used();
     }
 
+    var rect2 = new PIXI.Graphics();
+    rect2.lineStyle(5, 0xff0000, 1);
+    rect2.drawRect(0,0,400,400);
+
+    var rect3 = new PIXI.Graphics();
+    rect3.lineStyle(5, 0x00ff00, 1);
+    rect3.drawRect(0,0,400,400);
+    var txt = new PIXI.Text('Basic text in pixi');
+    var group = new PIXI.Container();
+    group.addChild(rect3);
+    group.addChild(txt);var t0 = performance.now();
     function start()
     {
         players= [world.addDynamic("assets/arrow1.png", 100,100), world.addDynamic("assets/arrow2.png", 200,200)];
-        cams = [new Camera(400, 400, players[0]), new Camera(400, 400, players[1], world)];
+        cams = [new Camera(400, 400, players[0], null,rect2), new Camera(400, 400, players[1], world, group)];
 
         var wall = spriteCache.createSprite("assets/wall.png");
         var size = {
