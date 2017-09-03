@@ -24,14 +24,21 @@
 
     loader.load(start);
 
-
     var world = {};
+    world.p2 = new p2.World({
+        gravity:[0, 0]
+    });
+
     world.width = 1000;
     world.height = 600;
     world.data= [];
     world.addStatic = function(name, x,y, rotation)
     {
         var sprite = spriteCache.createSprite(name);
+        var shape = new p2.Box({width: sprite.width, height: sprite.height});
+        var body = new p2.Body({ position:[x,-y],mass:0 });
+        body.addShape(shape);
+        world.p2.addBody(body);
         var obj = {
             name : name,
             x : x,
@@ -39,6 +46,30 @@
             rotation : rotation || 0,
             width : sprite.width,
             height : sprite.height,
+            body : body,
+            changed : true,
+            cam : []
+        };
+        spriteCache.releaseSprite(sprite);
+        world.data.push(obj);
+        return obj;
+
+    };
+    world.addDynamic = function(name, x,y, rotation)
+    {
+        var sprite = spriteCache.createSprite(name);
+        var shape = new p2.Box({width: sprite.width, height: sprite.height});
+        var body = new p2.Body({ position:[x,-y],mass:1 });
+        body.addShape(shape);
+        world.p2.addBody(body);
+        var obj = {
+            name : name,
+            x : x,
+            y : y,
+            rotation : rotation || 0,
+            width : sprite.width,
+            height : sprite.height,
+            body : body,
             changed : true,
             cam : []
         };
@@ -63,21 +94,22 @@
 
         //Loop this function at 60 frames per second
         requestAnimationFrame(gameLoop);
-        var speed = 10;
+
+        world.p2.step(1/60);
+        var speed = 1;
         for(var i = 0; i < players.length; ++i)
         {
             if(controllers[i].up) {
-                players[i].y -= speed;
+                players[i].body.applyForceLocal([0,10]);
             }
             if(controllers[i].down) {
-                players[i].y += speed;
+                players[i].body.applyForceLocal([0,-5]);
             }
-            if(controllers[i].left) {
-                players[i].x -= speed;
-            }
-            if(controllers[i].right) {
-                players[i].x += speed;
-            }
+
+            if(controllers[i].left)       players[i].body.angularVelocity =  speed;
+            else if(controllers[i].right) players[i].body.angularVelocity = -speed;
+            else              players[i].body.angularVelocity =  0;
+
             players[i].changed = true;
 
         }
@@ -90,7 +122,7 @@
 
     function start()
     {
-        players= [world.addStatic("assets/arrow1.png", 100,100), world.addStatic("assets/arrow2.png", 200,200)];
+        players= [world.addDynamic("assets/arrow1.png", 100,100), world.addDynamic("assets/arrow2.png", 200,200)];
         cams = [new Camera(400, 400, players[0]), new Camera(400, 400, players[1], world)];
 
         var wall = spriteCache.createSprite("assets/wall.png");
@@ -99,16 +131,16 @@
           y : wall.height
         };
         spriteCache.releaseSprite(wall);
-        for(var i = 0; i < world.width; i+=size.x)
+        for(var i = 0; i <= world.width; i+=size.x)
         {
             world.addStatic("assets/wall.png", i, 0);
-            world.addStatic("assets/wall.png", i, world.height - size.y);
+            world.addStatic("assets/wall.png", i, world.height-wall.height/2);
         }
 
-        for(i = 0; i < world.height; i+=size.y)
+        for(i = 0; i <= world.height; i+=size.y)
         {
             world.addStatic("assets/wall.png", 0, i);
-            world.addStatic("assets/wall.png", world.width - size.x, i);
+            world.addStatic("assets/wall.png", world.width-wall.width/2, i);
         }
         gameLoop();
 
