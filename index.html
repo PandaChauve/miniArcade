@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hello World</title>
+</head>
+<script src="libs/pixi.js"></script>
+<script src="libs/p2.js"></script>
+<script src="libs/keyboard.js"></script>
+<script src="spriteCache.js"></script>
+<script src="camera.js"></script>
+<script src="controller.js"></script>
+<body>
+<script type="text/javascript">
+    var controllers = [new Controller(), new Controller()];
+    var spriteCache = new SpriteCache();
+    var sprites = ["assets/arrow1.png", "assets/arrow2.png", "assets/wall.png"];
+    var loader = PIXI.loader;
+    for(var i = 0; i < sprites.length; ++i)
+    {
+        spriteCache.init(sprites[i]);
+        loader = loader.add(sprites[i]);
+    }
+
+    loader.load(start);
+
+
+    var world = {};
+    world.width = 1000;
+    world.height = 600;
+    world.data= [];
+    world.addStatic = function(name, x,y, rotation)
+    {
+        var sprite = spriteCache.createSprite(name);
+        var obj = {
+            name : name,
+            x : x,
+            y : y,
+            rotation : rotation || 0,
+            width : sprite.width,
+            height : sprite.height,
+            changed : true,
+            cam : []
+        };
+        spriteCache.releaseSprite(sprite);
+        world.data.push(obj);
+        return obj;
+
+    };
+    world.used = function()
+    {
+        for(var i = 0; i < this.data.length; ++i) {
+            this.data[i].changed = false;
+        }
+
+    };
+
+    var players;
+   var cams;
+
+
+    function gameLoop() {
+
+        //Loop this function at 60 frames per second
+        requestAnimationFrame(gameLoop);
+        var speed = 10;
+        for(var i = 0; i < players.length; ++i)
+        {
+            if(controllers[i].up) {
+                players[i].y -= speed;
+            }
+            if(controllers[i].down) {
+                players[i].y += speed;
+            }
+            if(controllers[i].left) {
+                players[i].x -= speed;
+            }
+            if(controllers[i].right) {
+                players[i].x += speed;
+            }
+            players[i].changed = true;
+
+        }
+        for(var i = 0; i < cams.length; ++i)
+        {
+            cams[i].draw(world);
+        }
+        world.used();
+    }
+
+    function start()
+    {
+        players= [world.addStatic("assets/arrow1.png", 100,100), world.addStatic("assets/arrow2.png", 200,200)];
+        cams = [new Camera(400, 400, players[0]), new Camera(400, 400, players[1])];
+
+        var wall = spriteCache.createSprite("assets/wall.png");
+        var size = {
+          x : wall.width,
+          y : wall.height
+        };
+        spriteCache.releaseSprite(wall);
+        for(var i = 0; i < world.width; i+=size.x)
+        {
+            world.addStatic("assets/wall.png", i, 0);
+            world.addStatic("assets/wall.png", i, world.height - size.y);
+        }
+
+        for(i = 0; i < world.height; i+=size.y)
+        {
+            world.addStatic("assets/wall.png", 0, i);
+            world.addStatic("assets/wall.png", world.width - size.x, i);
+        }
+        gameLoop();
+
+    }
+</script>
+</body>
+</html>
